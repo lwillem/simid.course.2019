@@ -1,14 +1,22 @@
 
 
+#rm(list=ls())
+
 library(here)
 library(gridExtra)
 library(ggplot2)
-rm(list=ls())
-source("./functions.R")
-source("./plot_functions.R")
+
+library(devtools)
+#devtools::install_github("lwillem/simid.course.2019",quiet=F)
+#devtools::uninstall('simid.course.2019')
+library('simid.course.2019')
+
+# TODO: remove in final version
+#source("R/meta_functions.R")
+#source("R/meta_plot_functions.R")
 
 N_patches=100
-N_times=800
+N_times=300
 beta=0.09
 gamma=0.033
 population_adults=rep(10000,N_patches)
@@ -17,10 +25,9 @@ population_children=rep(10000,N_patches)
 
 
 
-
-Adults=matrix(rep.int(0,N_patches*3),nrow=N_patches,ncol=3)    
+Adults=matrix(rep.int(0,N_patches*3),nrow=N_patches,ncol=3)
 colnames(Adults)<-c("S","I","R")
-Children=matrix(rep.int(0,N_patches*3),nrow=N_patches,ncol=3)    
+Children=matrix(rep.int(0,N_patches*3),nrow=N_patches,ncol=3)
 colnames(Children)<-c("S","I","R")
 S_matrix_adults=matrix(nrow=N_patches,ncol = N_times)
 S_matrix_children=matrix(nrow=N_patches,ncol = N_times)
@@ -90,41 +97,17 @@ for(i_time in 3:N_times){
   S_matrix_adults[,i_time]=Adults[,1]
   I_matrix_children[,i_time]=Children[,2]
   I_matrix_adults[,i_time]=  Adults[,2]
-  
+
   R_matrix_children[,i_time]=Children[,3]
   R_matrix_adults[,i_time]=Adults[,3]
-  
+
 }
 
 final_result<-list(S_matrix_children,I_matrix_children,R_matrix_children,S_matrix_adults,I_matrix_adults,R_matrix_adults)
 
-#plot_global_epidemic_ageclasses(final_result)
+plot_global_epidemic_ageclasses(final_result)
 
 plot_infected_ageclasses(final_result,30)
 
-
 plot_AR(final_result,population_children,population_adults)
-plot_AR<-function(list_results,pop_ch,pop_ad){
-  I_ch<-list_results[[2]]
-  I_ad<-list_results[[5]]
-  df_child<-data.frame(id=1:dim(I_ch)[1],AR_children=rowSums(I_ch)/pop_ch)
-  df_adult<-data.frame(id=1:dim(I_ad)[1],AR_adults=rowSums(I_ad)/pop_ad)
-  df<-merge(df_child,df_adult)
-  mytheme <- theme(panel.grid.major = element_line(colour="grey", size = (0.2)),
-                   panel.grid.minor = element_line(size = (0.2), colour="grey"))
-  
-  
-  plot1 <- ggplot(df, aes(x=id, y = value,color=variable)) + 
-    geom_point(aes(y = AR_children, col = "Children")) + 
-    geom_point(aes(y = AR_adults, col = "Adults")) +
-    labs(x = "Patch ID", y = "Percentage of total infected")+
-    mytheme
-  
-  df_diff<-data.frame(id=1:dim(I_ch)[1],diff=rowSums(I_ch)/pop_ch-rowSums(I_ad)/pop_ad)    
-  plot2 <- ggplot(df_diff) + 
-    geom_point(aes(x=id,y = diff, col = "Difference (ch-ad)")) + 
-    labs(x = "Patch ID", y = "Percentage")+
-    mytheme
-  grid.arrange(plot1, plot2, ncol=2)  
 
-}
