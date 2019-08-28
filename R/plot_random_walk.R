@@ -21,9 +21,10 @@
 #
 #############################################################################
 
-#' @title visualise the random walk
+#' @title Visualise the random walk
 #'
-#' @description This function creates a population with households of size 4.
+#' @description  This function shows the spatial configuration of the population
+#' with color codes for the health state and tracks one individual.
 #'
 #' @param pop_data        the vector with population data
 #' @param area_size       the total area size
@@ -88,6 +89,18 @@ plot_random_walk <- function(pop_data,area_size,i_day,plot_time_delay)
 } # end function
 
 
+#' @title Visualise the social contact radius
+#'
+#' @description This function shows the spatial configuration of the population
+#' with color codes for the health state and the social contact radious of one individual.
+#'
+#' @param pop_data        the vector with population data
+#' @param area_size       the total area size
+#' @param contact_distance           the current day
+#' @param num_contacts_day the time delay between two plots
+#'
+#' @keywords external
+#' @export
 plot_social_contact_radius <- function(pop_data,area_size,contact_distance,num_contacts_day)
 {
 
