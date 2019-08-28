@@ -22,7 +22,7 @@ rm(list = ls())
 # FYI: get sequence from 'min' up to 'max'     --> seq(min,max,step size)
 
 library(devtools)
-#devtools::install_github("lwillem/simid.course.2019",quiet=T)
+devtools::install_github("lwillem/simid.course.2019",quiet=T)
 library('simid.course.2019')
 
 ########################################
