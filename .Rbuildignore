@@ -1,2 +1,4 @@
+^LICENSE\.md$
+^tutorials$
 ^.*\.Rproj$
 ^\.Rproj\.user$
