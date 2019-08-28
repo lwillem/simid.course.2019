@@ -1,13 +1,13 @@
 
 
-#rm(list=ls())
+rm(list=ls())
 
 library(here)
 library(gridExtra)
 library(ggplot2)
 
 library(devtools)
-#devtools::install_github("lwillem/simid.course.2019",quiet=F)
+devtools::install_github("lwillem/simid.course.2019",quiet=F)
 #devtools::uninstall('simid.course.2019')
 library('simid.course.2019')
 
