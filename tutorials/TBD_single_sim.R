@@ -6,14 +6,14 @@ library(here)
 library(gridExtra)
 library(ggplot2)
 
-library(devtools)
-devtools::install_github("lwillem/simid.course.2019",quiet=F)
+#library(devtools)
+#devtools::install_github("lwillem/simid.course.2019",quiet=F)
 #devtools::uninstall('simid.course.2019')
-library('simid.course.2019')
+#library('simid.course.2019')
 
 # TODO: remove in final version
-#source("R/meta_functions.R")
-#source("R/meta_plot_functions.R")
+source("R/meta_functions.R")
+source("R/meta_plot_functions.R")
 
 N_patches=100
 N_times=300

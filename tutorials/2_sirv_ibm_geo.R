@@ -22,7 +22,7 @@ rm(list = ls())
 # FYI: get sequence from 'min' up to 'max'     --> seq(min,max,step size)
 
 library(devtools)
-devtools::install_github("lwillem/simid.course.2019",quiet=F)
+#devtools::install_github("lwillem/simid.course.2019",quiet=F)
 #devtools::uninstall('simid.course.2019')
 library('simid.course.2019')
 
@@ -31,20 +31,19 @@ library('simid.course.2019')
 ########################################
 
 # population, time horizon and initial conditions
-plot_title            <- 'ibm_random_walk'  # plot title
-pop_size              <- 1000               # population size
-num_days              <- 40                 # number of days to simulate (time step = one day)
-num_infected_seeds    <- 10                 # initial number of intected individuals
-vaccine_coverage      <- 0                  # vaccine coverage [0,1]
-rng_seed              <- 2019               # initial state of the random number generator
+pop_size              <- 1000     # population size
+num_days              <- 40       # number of days to simulate (time step = one day)
+num_infected_seeds    <- 10       # initial number of intected individuals
+vaccine_coverage      <- 0        # vaccine coverage [0,1]
+rng_seed              <- 2019     # initial state of the random number generator
 
-# geospatial parameters
-area_size           <- 20                   # simulated area = size x size
-max_velocity        <- 0                    # max movement in x and y direction per time step
+# geospatial parameters (km)
+area_size           <- 20         # simulated area = size x size
+max_velocity        <- 1          # max movement in x and y direction per time step
 
 # social contact parameters
-num_contacts_day      <- 10                 # average number of contacts per day
-contact_distance      <- 1                  # maximum distance between indiviuals for a social contact
+num_contacts_day      <- 10       # average number of social contacts per day
+max_contact_distance  <- 2      # max. distance for a social contact to take place during one day
 
 # disease parameters
 # note: R0 'cannot' be initialised in this type of model...
@@ -86,13 +85,13 @@ head(pop_data)
 
 # set recovery parameters
 recovery_rate <- 1/num_days_infected
-recovery_prob <- 1-exp(-recovery_rate)      # convert rate to probability
+contact_probability <- 1-exp(-recovery_rate)      # convert rate to probability
 
 # create matrix to log health states: one row per individual, one column per time step
 log_pop_data  <- matrix(NA,nrow=pop_size,ncol=num_days)
 
 # illustrate social contact radius
-plot_social_contact_radius(pop_data,area_size,contact_distance,num_contacts_day)
+geo_plot_social_contact_radius(pop_data,area_size,max_contact_distance,num_contacts_day)
 
 ########################################
 # RUN THE MODEL                        #
@@ -115,8 +114,8 @@ for(i_day in 1:num_days)
 
   # step 2: identify infected individuals
   boolean_infected <- pop_data$health == 'I'   # = boolean TRUE/FALSE
-  ind_infected  <- which(boolean_infected)     # = indices
-  num_infected  <- length(ind_infected)     # = number
+  ind_infected     <- which(boolean_infected)  # = indices
+  num_infected     <- length(ind_infected)     # = number
 
   # step 3: calculate the distance matrix using the 'dist' function and stora as matrix
   distance_matrix <- as.matrix(dist(pop_data[,c('x_coord','y_coord')],upper=T))
@@ -125,17 +124,17 @@ for(i_day in 1:num_days)
   p <- ind_infected[1]
   for(p in ind_infected)
   {
-
-    # identify possible contacts of person 'p'
-    num_possible_contacts  <- sum(distance_matrix[p,] <= contact_distance)
+    # identify possible social contacts of person 'p'
+    num_possible_contacts  <- sum(distance_matrix[p,] <= max_contact_distance)
 
     # calculate contact probability
-    contact_prob           <- 1-exp(-num_contacts_day / num_possible_contacts)
+    # tip: ?get_contact_probability
+    contact_probability    <- get_contact_probability(num_contacts_day,num_possible_contacts)
 
     # new infections are possible if individuals are susceptible and within the range of the transmission distance
     flag_new_infection     <- pop_data$health == 'S' &
-                              distance_matrix[p,] <= contact_distance &
-                              rbinom(pop_size, size = 1, prob = contact_prob * transmission_prob)
+                              distance_matrix[p,] <= max_contact_distance &
+                              rbinom(pop_size, size = 1, prob = contact_probability * transmission_prob)
 
     # mark new infected individuals
     pop_data$health[flag_new_infection] <- 'I'
@@ -148,15 +147,15 @@ for(i_day in 1:num_days)
   }
 
   # step 5: identify newly recovered individuals
-  new_recovered <- boolean_infected & rbinom(pop_size, size = 1, prob = recovery_prob)
+  new_recovered <- boolean_infected & rbinom(pop_size, size = 1, prob = contact_probability)
   pop_data$health[new_recovered] <- 'R'
 
   # step 6: log population health states
   log_pop_data[,i_day] <- pop_data$health
 
-  # --------------------- plot random walk ---------------------
-  plot_random_walk(pop_data,area_size,i_day,plot_time_delay)
-  # --------------------- plot random walk ---------------------
+  # --------------------- plot population by health state ---------------------
+  geo_plot_health_states(pop_data,area_size,i_day,plot_time_delay)
+  # --------------------- plot population by health state ---------------------
 
 } # end for-loop for each day
 
@@ -170,11 +169,13 @@ log_i <- colSums(log_pop_data == 'I')  / pop_size
 log_r <- colSums(log_pop_data == 'R')  / pop_size
 log_v <- colSums(log_pop_data == 'V')  / pop_size
 
+
+# plot health states over time
 plot(log_s,
      type='l',
      xlab='Time (days)',
      ylab='Population fraction',
-     main=plot_title,
+     main='Spatial IBM',
      ylim=c(0,1),
      lwd=2)
 lines(log_i,  col=2,lwd=2)
@@ -187,22 +188,31 @@ legend('right',legend=c('S','I','R','V'),col=1:4,lwd=2)
 print(paste0('TOTAL INCIDENCE: ',round(log_r[num_days]*100),'%'))
 
 # print peak details
-print(paste0('PEAK INCIDENCE: ',round(max(log_i)*100),'%'))
-print(paste0('PEAK DAY: ',which(log_i == max(log_i)))[1])
+print(paste0('PEAK INCIDENCE:  ',round(max(log_i)*100),'%'))
+print(paste0('PEAK DAY:        ',which(log_i == max(log_i)))[1])
 
 
 ########################################
 # secondary CASES                      #
 ########################################
 
-head(pop_data)
+# change figure layout => 2 sub-plots
+par(mfrow=c(1,2))
 boxplot(secondary_cases ~ time_of_infection, data=pop_data,
-        xlab='time of infection (day)',ylab='secondary cases',
+        xlab='time of infection (day)',
+        ylab='secondary cases',
         main='secondary cases',
-        ylim=c(0,10))
+        ylim=c(0,10),
+        xlim=c(0,num_days),
+        xaxt='n')
+axis(1,seq(0,num_days,5))
 
 boxplot(generation_interval ~ time_of_infection, data=pop_data,
-        xlab='time of infection (day)',ylab='generation interval',
-        main='secondary cases',
-        ylim=c(0,10))
+        xlab='time of infection (day)',
+        ylab='generation interval (days)',
+        main='generation interval',
+        ylim=c(0,10),
+        xlim=c(0,num_days),
+        xaxt='n')
+axis(1,seq(0,num_days,5))
 
