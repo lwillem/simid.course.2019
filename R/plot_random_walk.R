@@ -35,6 +35,10 @@
 plot_random_walk <- function(pop_data,area_size,i_day,plot_time_delay)
 {
 
+  if (plot_time_delay == 0){
+    return(NULL)
+  }
+
   #setup (once)
   if(i_day == 1 || !exists('participant_id')){
     # select one (centered) individual to track the location
@@ -61,16 +65,19 @@ plot_random_walk <- function(pop_data,area_size,i_day,plot_time_delay)
        ylim=c(0,area_size+2),
        pch  = 2);
   legend('topleft',c('S','I','R','V'),col=1:4,pch=2,ncol=4)
-  legend('topright',c('1 individual','path'),col=6, pch=c(17,-1),lty=c(0,1),ncol=2)
+
 
   # log coordinates
   log_part_coord[,i_day]   <<- c(pop_data$x_coord[participant_id],pop_data$y_coord[participant_id])
 
   # add movement of participant X
-  lines(log_part_coord[1,],log_part_coord[2,],col=6)
-  points(pop_data$x_coord[participant_id],pop_data$y_coord[participant_id],
-         col=6,
-         pch=17);
+  lines(log_part_coord[1,],log_part_coord[2,],col="orange",lwd=2)
+  points(pop_data$x_coord[participant_id],
+         pop_data$y_coord[participant_id],
+         col="orange",
+         pch=2,
+         lwd=5);
+  legend('topright',c('1 individual','path'),col="orange", pch=c(17,-1),lty=c(0,1),ncol=2,lwd=2)
 
   # add a day counter in the bottom left corner
   text(0.5,0,paste('day',i_day),bg="white")
@@ -81,5 +88,31 @@ plot_random_walk <- function(pop_data,area_size,i_day,plot_time_delay)
 } # end function
 
 
+plot_social_contact_radius <- function(pop_data,area_size,contact_distance,num_contacts_day)
+{
 
+  # plot population
+  plot_random_walk(pop_data,area_size,1,1)
 
+  # add grid
+  for(i_tick in 0:area_size){
+
+    line_col <- ifelse(i_tick %in% c(0,area_size),grey(0),grey(0.5))
+    line_lty <- ifelse(i_tick %in% c(0,area_size),1,2)
+
+    lines(rep(i_tick,area_size+1),0:area_size,lty=line_lty,col=line_col)
+    lines(0:area_size,rep(i_tick,area_size+1),lty=line_lty,col=line_col)
+  }
+
+  # get participant 'x'
+  distance_matrix   <- as.matrix(dist(pop_data[,c('x_coord','y_coord')],upper=F,method = "euclidean"))
+  distance_matrix[participant_id,participant_id] <- NA
+  possible_contacts <- distance_matrix[participant_id,] < contact_distance
+  points(pop_data$x_coord[possible_contacts],
+         pop_data$y_coord[possible_contacts],
+         pch=2,
+         col=6)
+
+  legend('topright',c('1 individual',paste0('possible contacts (n:',sum(possible_contacts,na.rm=T),')')),col=c("orange",6), pch=c(17,2),lty=0,ncol=2,lwd=2)
+
+}
