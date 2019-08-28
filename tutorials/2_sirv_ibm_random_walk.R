@@ -22,7 +22,7 @@ rm(list = ls())
 # FYI: get sequence from 'min' up to 'max'     --> seq(min,max,step size)
 
 # library(devtools)
-devtools::install_github("lwillem/simid.course.2019",quiet=T)
+#devtools::install_github("lwillem/simid.course.2019",quiet=F)
 #devtools::uninstall('simid.course.2019')
 library('simid.course.2019')
 
@@ -33,23 +33,23 @@ library('simid.course.2019')
 # population, time horizon and initial conditions
 plot_title            <- 'ibm_random_walk'  # plot title
 pop_size              <- 1000               # population size
-num_days              <- 10                 # number of days to simulate (time step = one day)
+num_days              <- 40                 # number of days to simulate (time step = one day)
 num_infected_seeds    <- 10                 # initial number of intected individuals
 vaccine_coverage      <- 0                  # vaccine coverage [0,1]
 rng_seed              <- 2019               # initial state of the random number generator
 
 # geospatial parameters
-area_size           <- 10                   # simulated area = size x size
-max_velocity        <- 1                    # max movement in x and y direction per time step
+area_size           <- 20                   # simulated area = size x size
+max_velocity        <- 0                    # max movement in x and y direction per time step
 
 # social contact parameters
 num_contacts_day      <- 10                 # average number of contacts per day
-contact_distance      <- 2                  # maximum distance between indiviuals for a social contact
+contact_distance      <- 1                  # maximum distance between indiviuals for a social contact
 
 # disease parameters
+# note: R0 'cannot' be initialised in this type of model...
 num_days_infected     <- 7
-#R0                   <- 3                  # R0 'cannot' be initialised in this type of model...
-transmission_prob     <- 0.1                # transmission probability per contact
+transmission_prob     <- 0.1                # transmission probability per social contact
 
 # visualisation parameter
 # note: default '0.1' but set to '0' to disable this feature
@@ -62,7 +62,7 @@ plot_time_delay       <- 0.1                # delay in seconds to slow down the 
 # initialize random number generator
 set.seed(rng_seed)
 
-# population vector: one row per individual, one column per attribute
+# population vector: one row per individual, one column per attribute, row index = id
 pop_data     <- data.frame(health  = rep('S',length=pop_size),  # all individuals start in state 'S' (= susceptible)
                            x_coord = sample(seq(0,area_size,0.01),pop_size,replace = T), # sample random x coordinate
                            y_coord = sample(seq(0,area_size,0.01),pop_size,replace = T), # sample random y coordinate
@@ -73,16 +73,16 @@ pop_data     <- data.frame(health  = rep('S',length=pop_size),  # all individual
                            stringsAsFactors    = FALSE)         # option to treat characters as 'strings' instead of 'factors'
 
 # apply vaccine coverage
-pop_data$health[sample(pop_size,pop_size*vaccine_coverage)] <- 'V'
+id_vaccinated                  <- sample(pop_size,pop_size*vaccine_coverage)
+pop_data$health[id_vaccinated] <- 'V'
 
 # introduce infected individuals in the population
-num_infected_seeds                             <- sample(which(pop_data$health=='S'),num_infected_seeds)
-pop_data$health[num_infected_seeds]            <- 'I'
-pop_data$time_of_infection[num_infected_seeds] <- 0
+id_infected_seeds                             <- sample(which(pop_data$health=='S'),num_infected_seeds)
+pop_data$health[id_infected_seeds]            <- 'I'
+pop_data$time_of_infection[id_infected_seeds] <- 0
 
 # print the top 6 rows of the pop_data
 head(pop_data)
-
 
 # set recovery parameters
 recovery_rate <- 1/num_days_infected
@@ -144,7 +144,7 @@ for(i_day in 1:num_days)
     pop_data$infector[flag_new_infection]             <- p
     pop_data$time_of_infection[flag_new_infection]    <- i_day
     pop_data$secondary_cases[p]                       <- pop_data$secondary_cases[p] + sum(flag_new_infection)
-
+    pop_data$generation_interval[flag_new_infection]  <- i_day - pop_data$time_of_infection[p]
   }
 
   # step 5: identify newly recovered individuals
@@ -183,7 +183,13 @@ lines(log_v,  col=4,lwd=2)
 
 legend('right',legend=c('S','I','R','V'),col=1:4,lwd=2)
 
-print(paste0('TOTAL INCIDENCE: ',log_r[num_days]*100,'%'))
+# print total incidence
+print(paste0('TOTAL INCIDENCE: ',round(log_r[num_days]*100),'%'))
+
+# print peak details
+print(paste0('PEAK INCIDENCE: ',round(max(log_i)*100),'%'))
+print(paste0('PEAK DAY: ',which(log_i == max(log_i)))[1])
+
 
 ########################################
 # secondary CASES                      #
@@ -195,4 +201,8 @@ boxplot(secondary_cases ~ time_of_infection, data=pop_data,
         main='secondary cases',
         ylim=c(0,10))
 
+boxplot(generation_interval ~ time_of_infection, data=pop_data,
+        xlab='time of infection (day)',ylab='generation interval',
+        main='secondary cases',
+        ylim=c(0,10))
 

@@ -17,7 +17,7 @@
 # Copyright (C) 2019 lwillem, SIMID, UNIVERSITY OF ANTWERP, BELGIUM
 #############################################################################
 #
-# FUNCTION TO VISUALISE A RANDOM WALK
+# FUNCTION TO VISUALISE THE POPULATION IN THE RANDOM WALK TUTORIAL
 #
 #############################################################################
 
@@ -41,7 +41,7 @@ plot_random_walk <- function(pop_data,area_size,i_day,plot_time_delay)
   }
 
   #setup (once)
-  if(i_day == 1 || !exists('participant_id')){
+  if(!exists('participant_id')){
     # select one (centered) individual to track the location
     sel_id <- which(abs(pop_data$x_coord-(area_size/2)) < 1 &
                             abs(pop_data$y_coord-(area_size/2)) < 1)
@@ -72,13 +72,13 @@ plot_random_walk <- function(pop_data,area_size,i_day,plot_time_delay)
   log_part_coord[,i_day]   <<- c(pop_data$x_coord[participant_id],pop_data$y_coord[participant_id])
 
   # add movement of participant X
-  lines(log_part_coord[1,],log_part_coord[2,],col="orange",lwd=2)
+  lines(log_part_coord[1,],log_part_coord[2,],col=6,lwd=2)
   points(pop_data$x_coord[participant_id],
          pop_data$y_coord[participant_id],
-         col="orange",
+         col=6,
          pch=2,
          lwd=5);
-  legend('topright',c('1 individual','path'),col="orange", pch=c(17,-1),lty=c(0,1),ncol=2,lwd=2)
+  legend('topright',c('1 individual','path'),col=6, pch=c(17,-1),lty=c(0,1),ncol=2,lwd=2)
 
   # add a day counter in the bottom left corner
   text(0.5,0,paste('day',i_day),bg="white")
@@ -124,8 +124,8 @@ plot_social_contact_radius <- function(pop_data,area_size,contact_distance,num_c
   points(pop_data$x_coord[possible_contacts],
          pop_data$y_coord[possible_contacts],
          pch=2,
-         col=6)
+         col="orange")
 
-  legend('topright',c('1 individual',paste0('possible contacts (n:',sum(possible_contacts,na.rm=T),')')),col=c("orange",6), pch=c(17,2),lty=0,ncol=2,lwd=2)
-
+  legend('topright',c('1 individual',paste0('possible contacts (n:',sum(possible_contacts,na.rm=T),')')),
+         col=c(6,"orange"), pch=c(17,2),lty=0,ncol=2,lwd=2)
 }
