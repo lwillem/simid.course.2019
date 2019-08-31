@@ -4,7 +4,7 @@
 # Copyright 2019, CHERMID, UNIVERSITY OF ANTWERP
 #############################################################################
 #
-# IBM: SIRV MODEL WITH
+# INDIVIDUAL-BASED MODEL (IBM) WITH:
 #   --> INDIVIDUAL-BASED WITH SPATIALLY EXPLICIT RANDOM WALK
 #   --> HEALTH STATES S, I, R, V
 #   --> VACCINE EFFICACY: 100%
@@ -22,7 +22,7 @@ rm(list = ls())
 # FYI: get sequence from 'min' up to 'max'     --> seq(min,max,step size)
 
 library(devtools)
-#devtools::install_github("lwillem/simid.course.2019",quiet=F)
+devtools::install_github("lwillem/simid.course.2019",quiet=F)
 #devtools::uninstall('simid.course.2019')
 library('simid.course.2019')
 
@@ -32,14 +32,14 @@ library('simid.course.2019')
 
 # population, time horizon and initial conditions
 pop_size              <- 1000     # population size
-num_days              <- 40       # number of days to simulate (time step = one day)
-num_infected_seeds    <- 10       # initial number of intected individuals
-vaccine_coverage      <- 0        # vaccine coverage [0,1]
-rng_seed              <- 2019     # initial state of the random number generator
+num_days              <- 50       # number of days to simulate (time step = one day)
+num_infected_seeds    <- 3       # initial number of intected individuals
+vaccine_coverage      <- 0.1        # vaccine coverage [0,1]
+#rng_seed              <- 2020     # initial state of the random number generator
 
 # geospatial parameters (km)
 area_size           <- 20         # simulated area = size x size
-max_velocity        <- 1          # max movement in x and y direction per time step
+max_velocity        <- 0          # max movement in x and y direction per time step
 
 # social contact parameters
 num_contacts_day      <- 10       # average number of social contacts per day
@@ -52,14 +52,14 @@ transmission_prob     <- 0.1                # transmission probability per socia
 
 # visualisation parameter
 # note: default '0.1' but set to '0' to disable this feature
-plot_time_delay       <- 0.1                # delay in seconds to slow down the "real-time" plot
+plot_time_delay       <- 0               # delay in seconds to slow down the "real-time" plot
 
 
 ##########################################################
 # INITIALIZE POPULATION & MODEL PARAMETERS               #
 ##########################################################
-# initialize random number generator
-set.seed(rng_seed)
+# option to initialize random number generator
+if(exists('rng_seed')) {set.seed(rng_seed)}
 
 # population vector: one row per individual, one column per attribute, row index = id
 pop_data     <- data.frame(health  = rep('S',length=pop_size),  # all individuals start in state 'S' (= susceptible)
@@ -71,9 +71,14 @@ pop_data     <- data.frame(health  = rep('S',length=pop_size),  # all individual
                            secondary_cases     = 0,             # column to store the number of secondary cases
                            stringsAsFactors    = FALSE)         # option to treat characters as 'strings' instead of 'factors'
 
-# apply vaccine coverage
-id_vaccinated                  <- sample(pop_size,pop_size*vaccine_coverage)
-pop_data$health[id_vaccinated] <- 'V'
+# set vaccine coverage
+# option A: random
+ id_vaccinated                  <- sample(pop_size,pop_size*vaccine_coverage)
+ pop_data$health[id_vaccinated] <- 'V'
+
+# option B: spatial clustering with respect to vaccine refusal (course objective)
+# id_vaccinated                  <- sample_vaccine_refusal(pop_data,vaccine_coverage)
+# pop_data$health[id_vaccinated] <- 'V'
 
 # introduce infected individuals in the population
 id_infected_seeds                             <- sample(which(pop_data$health=='S'),num_infected_seeds)
@@ -153,9 +158,9 @@ for(i_day in 1:num_days)
   # step 6: log population health states
   log_pop_data[,i_day] <- pop_data$health
 
-  # --------------------- plot population by health state ---------------------
+  # plot spatial configuration of the population by health state
   geo_plot_health_states(pop_data,area_size,i_day,plot_time_delay)
-  # --------------------- plot population by health state ---------------------
+
 
 } # end for-loop for each day
 
@@ -170,6 +175,9 @@ log_r <- colSums(log_pop_data == 'R')  / pop_size
 log_v <- colSums(log_pop_data == 'V')  / pop_size
 
 
+# change figure configuration => 3 subplots
+par(mfrow=c(1,3))
+
 # plot health states over time
 plot(log_s,
      type='l',
@@ -182,13 +190,13 @@ lines(log_i,  col=2,lwd=2)
 lines(log_r,  col=3,lwd=2)
 lines(log_v,  col=4,lwd=2)
 
-legend('right',legend=c('S','I','R','V'),col=1:4,lwd=2)
+legend('top',legend=c('S','I','R','V'),col=1:4,lwd=2,ncol=2,cex=0.7)
 
 # print total incidence
-print(paste0('TOTAL INCIDENCE: ',round(log_r[num_days]*100),'%'))
+print(paste0('TOTAL INCIDENCE: ',round((log_i[num_days] + log_r[num_days])*100,digits=2),'%'))
 
 # print peak details
-print(paste0('PEAK INCIDENCE:  ',round(max(log_i)*100),'%'))
+print(paste0('PEAK PREVELENCE: ',round(max(log_i)*100,digits=2),'%'))
 print(paste0('PEAK DAY:        ',which(log_i == max(log_i)))[1])
 
 
@@ -196,8 +204,6 @@ print(paste0('PEAK DAY:        ',which(log_i == max(log_i)))[1])
 # secondary CASES                      #
 ########################################
 
-# change figure layout => 2 sub-plots
-par(mfrow=c(1,2))
 boxplot(secondary_cases ~ time_of_infection, data=pop_data,
         xlab='time of infection (day)',
         ylab='secondary cases',

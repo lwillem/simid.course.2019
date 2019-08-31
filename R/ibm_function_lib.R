@@ -50,3 +50,54 @@ get_contact_probability <- function(average_num_contacts,num_possible_contacts)
 
 }
 
+
+#' @title EXAMPLE to incorporate spatial vaccine refusal
+#'
+#' @description  This functions assumes spatial vaccine refusal in the
+#' outer regions of the simulated area.
+#'
+#' @param pop_size          matrix with population data
+#' @param vaccine_coverage  the vaccine coverage
+#'
+#' @keywords external
+#' @export
+sample_vaccine_refusal <- function(pop_data,vaccine_coverage){
+
+  # (re)define the center of the simulated area
+  area_size   <- max(c(pop_data$x_coord,pop_data$y_coord))
+  area_center <- area_size / 2
+
+  # (re)define population size
+  pop_size <- nrow(pop_data)
+
+  # define compliance radius
+  radius <- (area_size/2) * vaccine_coverage * 0.9
+
+  # select individuals in the central region, based on central x- and y-coordinates
+  sel_x <- pop_data$x_coord < (area_center+radius) & pop_data$x_coord > (area_center-radius)
+  sel_y <- pop_data$y_coord < (area_center+radius) & pop_data$y_coord > (area_center-radius)
+
+  # combine the selection on x- and y-coordinate
+  id_vaccine_potentials <- which(sel_x | sel_y)
+  length(id_vaccine_potentials)
+
+  # # if we have to little vaccine potentials, add random individuals
+  # if(length(id_vaccine_potentials) < (pop_size*vaccine_coverage)){
+  #   id_non_potentials        <- seq(1,pop_size) %in% id_vaccine_potentials
+  #   required_potentials      <- (pop_size*vaccine_coverage) - length(id_vaccine_potentials)
+  #   id_additional_potentials <- sample(id_non_potentials,required_potentials)
+  #   id_vaccine_potentials    <- c(id_vaccine_potentials,id_additional_potentials)
+  # }
+
+  # sample from the potential vaccineted individualss
+  id_vaccinated <- sample(id_vaccine_potentials,pop_size*vaccine_coverage)
+
+  tmp_pop_data <- pop_data
+  tmp_pop_data$health <- 'S'
+  tmp_pop_data$health[id_vaccinated] <- 'R'
+  geo_plot_health_states(tmp_pop_data,area_size,1,1)
+
+  # return indices
+  return(id_vaccinated)
+}
+

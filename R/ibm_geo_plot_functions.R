@@ -51,8 +51,10 @@ geo_plot_health_states <- function(pop_data,area_size,i_day,plot_time_delay)
     # sample one id and create matrix to log the x- and y-coordinates
     participant_id   <<- sample(id_centered,1)
     log_part_coord   <<- matrix(NA,nrow=2,ncol=num_days)
+  }
 
-    # set figure layout
+  # (re)set figure layout on day 1
+  if(i_day == 1){
     par(mfrow=c(1,1))
   }
 
@@ -73,7 +75,8 @@ geo_plot_health_states <- function(pop_data,area_size,i_day,plot_time_delay)
        ylab = 'y coordinate (km)',
        xlim = c(0,area_size),
        ylim = c(0,area_size+2),
-       pch  = 2);
+       pch  = 2,
+       main = paste('day',i_day));
 
   # add legend with color coding
   legend('topleft',
@@ -105,7 +108,8 @@ geo_plot_health_states <- function(pop_data,area_size,i_day,plot_time_delay)
          cex  = legend_cex)
 
   # add a day counter at the bottom left corner
-  text(0.5,0,paste('day',i_day),bg="white")
+  #text(area_size/2,area_size+1,paste('day',i_day),bg="white")
+  #legend('top',paste('day',i_day),bg=NA, box.col = NA)
 
   # pause the system to make the time steps visual
   Sys.sleep(plot_time_delay)
