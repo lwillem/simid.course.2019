@@ -101,3 +101,36 @@ sample_vaccine_refusal <- function(pop_data,vaccine_coverage){
   return(id_vaccinated)
 }
 
+
+
+#' @title Print model parameters from the ibm_sirv_geo tutorial on the console
+#'
+#' @description  This functions provides an overview of the model parameters
+#'
+#' @note This function is created for the ibm_sirv_geo tutorial
+#'
+#' @keywords external
+#' @export
+print_sirv_geo_param <- function(){
+
+  # collect possible parameter names
+  all_param <- c('pop_size','num_days' ,'num_infected_seeds','vaccine_coverage',
+                 'rng_seed','area_size','max_velocity','num_contacts_day',
+                 'max_contact_distance', 'num_days_infected','transmission_prob')
+
+  # initiate string
+  param_str <- ''
+
+  # loop over the given parameter names, if present, add name & value
+  for(i_param in all_param){
+    if(exists(i_param)){
+      param_str <- paste(param_str,'||',i_param,':',get(i_param))
+    }
+  }
+
+  # print string
+  cli::cat_rule('MODEL PARAMETERS')
+  cli::cat_line(param_str,' ||')
+  cli::cat_rule()
+}
+

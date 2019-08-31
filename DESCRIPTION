@@ -7,5 +7,6 @@ Maintainer: Lander Willem <lander.willem@uantwerp.be>
 Description: This package contains R tutorials and help functions to cover dynamic modelling of infectious diseases using meta-population and individual-based models.
 License: GPL-3
 Encoding: UTF-8
+Depends: cli
 LazyData: true
 RoxygenNote: 6.1.1

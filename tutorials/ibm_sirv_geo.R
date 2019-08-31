@@ -31,28 +31,28 @@ library('simid.course.2019')
 ########################################
 
 # population, time horizon and initial conditions
-pop_size              <- 1000     # population size
-num_days              <- 50       # number of days to simulate (time step = one day)
-num_infected_seeds    <- 3       # initial number of intected individuals
-vaccine_coverage      <- 0.1        # vaccine coverage [0,1]
+pop_size              <- 1000     # population size                         ||default = 1000||
+num_days              <- 50       # number of days to simulate (time step = one day) ||default = 50||
+num_infected_seeds    <- 3       # initial number of intected individuals   ||default = 3||
+vaccine_coverage      <- 0.1        # vaccine coverage [0,1]                ||default = 0.1||
 #rng_seed              <- 2020     # initial state of the random number generator
 
 # geospatial parameters (km)
-area_size           <- 20         # simulated area = size x size
-max_velocity        <- 0          # max movement in x and y direction per time step
+area_size           <- 20         # simulated area = size x size                        ||default = 20||
+max_velocity        <- 0          # max movement in x and y direction per time step     ||default = 0||
 
 # social contact parameters
-num_contacts_day      <- 10       # average number of social contacts per day
-max_contact_distance  <- 2      # max. distance for a social contact to take place during one day
+num_contacts_day      <- 10       # average number of social contacts per day  ||default = 10||
+max_contact_distance  <- 2        # max. distance for a social contact to take place during one day ||default = 2||
 
 # disease parameters
 # note: R0 'cannot' be initialised in this type of model...
-num_days_infected     <- 7
-transmission_prob     <- 0.1                # transmission probability per social contact
+num_days_infected     <- 7        # average number of days individuals are infected/infectious    ||default = 7||
+transmission_prob     <- 0.1      # transmission probability per social contact                   ||default = 0.1||
 
 # visualisation parameter
 # note: default '0.1' but set to '0' to disable this feature
-plot_time_delay       <- 0               # delay in seconds to slow down the "real-time" plot
+plot_time_delay       <- 0.1      # delay in seconds to slow down the "real-time" plot ||default = O||
 
 
 ##########################################################
@@ -89,8 +89,8 @@ pop_data$time_of_infection[id_infected_seeds] <- 0
 head(pop_data)
 
 # set recovery parameters
-recovery_rate <- 1/num_days_infected
-contact_probability <- 1-exp(-recovery_rate)      # convert rate to probability
+recovery_rate        <- 1/num_days_infected
+recovery_probability <- 1-exp(-recovery_rate)      # convert rate to probability
 
 # create matrix to log health states: one row per individual, one column per time step
 log_pop_data  <- matrix(NA,nrow=pop_size,ncol=num_days)
@@ -152,7 +152,7 @@ for(i_day in 1:num_days)
   }
 
   # step 5: identify newly recovered individuals
-  new_recovered <- boolean_infected & rbinom(pop_size, size = 1, prob = contact_probability)
+  new_recovered <- boolean_infected & rbinom(pop_size, size = 1, prob = recovery_probability)
   pop_data$health[new_recovered] <- 'R'
 
   # step 6: log population health states
@@ -191,6 +191,9 @@ lines(log_r,  col=3,lwd=2)
 lines(log_v,  col=4,lwd=2)
 
 legend('top',legend=c('S','I','R','V'),col=1:4,lwd=2,ncol=2,cex=0.7)
+
+#help function: ?print_sirv_geo_param()
+print_sirv_geo_param()
 
 # print total incidence
 print(paste0('TOTAL INCIDENCE: ',round((log_i[num_days] + log_r[num_days])*100,digits=2),'%'))

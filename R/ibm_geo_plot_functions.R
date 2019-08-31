@@ -133,7 +133,7 @@ geo_plot_social_contact_radius <- function(pop_data,area_size,max_contact_distan
 {
 
   # plot population
-  geo_plot_health_states(pop_data,area_size,1,1)
+  geo_plot_health_states(pop_data,area_size,1,0.1)
 
   # add grid lines
   # note: 'abline' covers the full figure area and cannot be stoped at the model world boundary
