@@ -94,7 +94,7 @@ sample_vaccine_refusal <- function(pop_data,vaccine_coverage){
 
   tmp_pop_data <- pop_data
   tmp_pop_data$health <- 'S'
-  tmp_pop_data$health[id_vaccinated] <- 'R'
+  tmp_pop_data$health[id_vaccinated] <- 'V'
   geo_plot_health_states(tmp_pop_data,area_size,1,1)
 
   # return indices

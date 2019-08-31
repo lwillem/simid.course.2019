@@ -174,7 +174,7 @@ geo_plot_social_contact_radius <- function(pop_data,area_size,max_contact_distan
          col  = c(0,"orange",0),
          pch  = c(-1,2,-1),
          lty  = 0,
-         ncol =2,
+         ncol = 2,
          lwd  = 2,
          cex  = legend_cex)
 }
