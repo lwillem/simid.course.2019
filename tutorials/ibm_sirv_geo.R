@@ -96,7 +96,7 @@ recovery_probability <- 1-exp(-recovery_rate)      # convert rate to probability
 log_pop_data  <- matrix(NA,nrow=pop_size,ncol=num_days)
 
 # illustrate social contact radius
-geo_plot_social_contact_radius(pop_data,area_size,max_contact_distance,num_contacts_day)
+geo_plot_social_contact_radius(pop_data,area_size,max_contact_distance,num_contacts_day,num_days)
 
 ########################################
 # RUN THE MODEL                        #
@@ -159,7 +159,7 @@ for(i_day in 1:num_days)
   log_pop_data[,i_day] <- pop_data$health
 
   # plot spatial configuration of the population by health state
-  geo_plot_health_states(pop_data,area_size,i_day,plot_time_delay)
+  geo_plot_health_states(pop_data,area_size,i_day,num_days,plot_time_delay)
 
 
 } # end for-loop for each day

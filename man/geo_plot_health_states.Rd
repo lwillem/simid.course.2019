@@ -4,7 +4,8 @@
 \alias{geo_plot_health_states}
 \title{Plot of the population by health state}
 \usage{
-geo_plot_health_states(pop_data, area_size, i_day, plot_time_delay)
+geo_plot_health_states(pop_data, area_size, i_day, num_days,
+  plot_time_delay)
 }
 \arguments{
 \item{pop_data}{the vector with population data}

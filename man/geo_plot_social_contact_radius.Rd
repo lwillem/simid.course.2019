@@ -5,7 +5,7 @@
 \title{Plot the population and focus on the social contact radius}
 \usage{
 geo_plot_social_contact_radius(pop_data, area_size, max_contact_distance,
-  average_num_contacts)
+  average_num_contacts, num_days)
 }
 \arguments{
 \item{pop_data}{the vector with population data}

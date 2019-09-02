@@ -33,7 +33,7 @@
 #'
 #' @keywords external
 #' @export
-geo_plot_health_states <- function(pop_data,area_size,i_day,plot_time_delay)
+geo_plot_health_states <- function(pop_data,area_size,i_day,num_days,plot_time_delay)
 {
 
   # if the time-delay is '0' ==>> skip figures
@@ -129,11 +129,11 @@ geo_plot_health_states <- function(pop_data,area_size,i_day,plot_time_delay)
 #'
 #' @keywords external
 #' @export
-geo_plot_social_contact_radius <- function(pop_data,area_size,max_contact_distance,average_num_contacts)
+geo_plot_social_contact_radius <- function(pop_data,area_size,max_contact_distance,average_num_contacts,num_days)
 {
 
   # plot population
-  geo_plot_health_states(pop_data,area_size,1,0.1)
+  geo_plot_health_states(pop_data,area_size,1,num_days,0.1)
 
   # add grid lines
   # note: 'abline' covers the full figure area and cannot be stoped at the model world boundary
