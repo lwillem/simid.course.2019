@@ -1,7 +1,7 @@
 Package: simid.course.2019
 Type: Package
 Title: Material for the SIMID course, 2019
-Version: 0.1.3
+Version: 0.1.4
 Author: Lander Willem & Pietro Coletti
 Maintainer: Lander Willem <lander.willem@uantwerp.be>
 Description: This package contains R tutorials and help functions to cover dynamic modelling of infectious diseases using meta-population and individual-based models.
@@ -10,4 +10,4 @@ Encoding: UTF-8
 Depends: cli
 LazyData: true
 RoxygenNote: 6.1.1
-Commit: 4331145145285cf04d9e5fde4050133789566757
+Commit: a9a1080e3e7595c38e1343651573d6fd79b65947
