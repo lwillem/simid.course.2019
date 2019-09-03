@@ -39,7 +39,9 @@ get_default_param_ibm_sirv_geo <- function(){
 
                               # visualisation parameter
                               # note: default '0.1' but set to '0' to disable this feature
-                              plot_time_delay       = 0      # delay in seconds to slow down the "real-time" plot ||default = O||
+                              plot_time_delay       = 0,      # delay in seconds to slow down the "real-time" plot ||default = O||
+
+                              randomized_immunity   = TRUE    # boolead to switch between random/clustered immunity
                            )
 
   # return
@@ -85,9 +87,17 @@ run_ibm_sirv_geo <- function(sim_param = NULL){
                              stringsAsFactors    = FALSE)         # option to treat characters as 'strings' instead of 'factors'
 
   # set vaccine coverage
-  # option A: random
-  id_vaccinated                  <- sample(sim_param$pop_size,sim_param$pop_size*sim_param$vaccine_coverage)
-  pop_data$health[id_vaccinated] <- 'V'
+  if(sim_param$randomized_immunity){
+    # option A: random assignment
+    id_vaccinated                  <- sample(sim_param$pop_size,sim_param$pop_size*sim_param$vaccine_coverage)
+    pop_data$health[id_vaccinated] <- 'V'
+  } else {
+
+    # option B: spatial clustering with respect to vaccine refusal (course objective)
+    id_vaccinated                  <- sample_vaccine_refusal(pop_data,sim_param$vaccine_coverage)
+    pop_data$health[id_vaccinated] <- 'V'
+  }
+
 
   # introduce infected individuals in the population
   id_infected_seeds                             <- sample(which(pop_data$health=='S'),sim_param$num_infected_seeds)

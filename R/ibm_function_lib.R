@@ -81,21 +81,17 @@ sample_vaccine_refusal <- function(pop_data,vaccine_coverage){
   id_vaccine_potentials <- which(sel_x | sel_y)
   length(id_vaccine_potentials)
 
-  # # if we have to little vaccine potentials, add random individuals
-  # if(length(id_vaccine_potentials) < (pop_size*vaccine_coverage)){
-  #   id_non_potentials        <- seq(1,pop_size) %in% id_vaccine_potentials
-  #   required_potentials      <- (pop_size*vaccine_coverage) - length(id_vaccine_potentials)
-  #   id_additional_potentials <- sample(id_non_potentials,required_potentials)
-  #   id_vaccine_potentials    <- c(id_vaccine_potentials,id_additional_potentials)
-  # }
+  # if we have to little vaccine potentials, add random individuals
+  if(length(id_vaccine_potentials) < (pop_size*vaccine_coverage)){
+    id_non_potentials        <- seq(1,pop_size) %in% id_vaccine_potentials
+    required_potentials      <- (pop_size*vaccine_coverage) - length(id_vaccine_potentials)
+    id_additional_potentials <- sample(id_non_potentials,required_potentials)
+    id_vaccine_potentials    <- c(id_vaccine_potentials,id_additional_potentials)
+  }
 
   # sample from the potential vaccineted individualss
   id_vaccinated <- sample(id_vaccine_potentials,pop_size*vaccine_coverage)
 
-  tmp_pop_data <- pop_data
-  tmp_pop_data$health <- 'S'
-  tmp_pop_data$health[id_vaccinated] <- 'V'
-  geo_plot_health_states(tmp_pop_data,area_size,1,1)
 
   # return indices
   return(id_vaccinated)
