@@ -54,9 +54,9 @@ num_schools            <- 2          # number of classes per age group
 target_school_ages     <- c(3:18)
 
 # social contact parameters
-num_contacts_community_day <- 5    # average number of social contacts per day in the general community ||default = 5||
-contact_prob_household     <- 1    # fully connected
-contact_prob_school        <- 0.1  # propability for an "effective contact" at school
+num_contacts_community_day <- 4    # average number of "effective contacts" per day in the general community ||default = 4||
+contact_prob_household     <- 1    # fully connected ||default = 1||
+contact_prob_school        <- 0.1  # propability for an "effective contact" at school ||default = 0.1||
 
 # disease parameters
 # note: R0 'cannot' be initialised in this type of model...
@@ -251,7 +251,7 @@ image.plot(transmission_age_matrix,    # requires the 'field' package
            ylab='Age contact',
            main='Transmission matrix',
            col=heat.colors(10),
-           breaks=c(0:6,8,10,15,max(c(20,transmission_age_matrix))))
+           breaks=c(0:4,seq(5,25,5),max(c(30,transmission_age_matrix))))
 axis(side=1,
      at=seq(0,1,length.out=nrow(transmission_age_matrix)),
      labels=rownames(transmission_age_matrix),

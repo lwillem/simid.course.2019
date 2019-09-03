@@ -25,7 +25,7 @@
 #'
 #' @description This function creates a population with households of size 4.
 #'
-#' @param pop_size the final population size
+#' @param pop_size  the final population size
 #' @param area_size the size of the simulation area (to sample coordinates)
 #'
 #' @keywords external
@@ -39,12 +39,12 @@ create_population_matrix <- function(pop_size,area_size)
   adult_age_tolerance     <- 0:5    # age tolerance between adults
   child_age_tolerance     <- 1:4    # age tolerance between children
   household_age_gap_min   <- 18     # min age gap between adults and children
-  household_age_gap_max   <- 30     # max age gap age between adults and children
+  household_age_gap_max   <- 35     # max age gap age between adults and children
 
   # create the population
-  pop_data <- NULL          # start from empty matrix
+  pop_data         <- NULL  # start from empty matrix
   current_pop_size <- 0     # start from size '0'
-  hh_id <- 1                # a counter variable to track the household id
+  hh_id            <- 1     # a counter variable to track the household id
 
    # continue as long as 'population size' < 'target population size'
   while(current_pop_size<pop_size){
@@ -55,9 +55,10 @@ create_population_matrix <- function(pop_size,area_size)
     # sample the age of adult 2, given adult 1
     age_adult2 <- sample(age_adult1 + adult_age_tolerance, 1)
 
-    # fix the possible child ages
+    # get the possible child ages
     ages_child_option <- min(age_adult1,age_adult2) - (household_age_gap_min:household_age_gap_max )
     ages_child_option[!ages_child_option %in% ages_child]  <- NA
+    ages_child_option <- c(NA,ages_child_option[!is.na(ages_child_option)])
 
     # sample the age of child 1
     age_child1 <- sample(ages_child_option, 1)
@@ -69,8 +70,10 @@ create_population_matrix <- function(pop_size,area_size)
     hh_data <- data.frame(age = c(age_adult1,age_adult2,age_child1,age_child2),
                           hh_id = hh_id)
 
-    # remove individuals with age 'NA'
+    # remove individuals with age 'NA' or negative ages (unborn)
     hh_data <- hh_data[!is.na(hh_data$age),]
+    hh_data <- hh_data[hh_data$age>=0,]
+
 
     # add a household member id
     hh_data$member_id <- 1:nrow(hh_data)
