@@ -236,3 +236,25 @@ plot_AR<-function(list_results,pop_ch,pop_ad){
   grid.arrange(plot1, plot2, ncol=2)
 
 }
+
+#' @title plot_AR_network
+#'
+#' @keywords external
+#' @export
+plot_AR_network<-function(trav_matr,list_results,pop_ch,pop_ad){
+  net<-graph_from_adjacency_matrix(weighted = TRUE,adjmatrix=trav_matr,mode="plus")
+  #################
+  I_tot<-list_results[[5]]+list_results[[2]]
+  df<-data.frame(id=1:dim(I_tot)[1],AR=rowSums(I_tot)/(pop_ad+pop_ch))
+  ##################
+  set_vertex_attr(net,name="AR",value=df$AR)
+  palet<-colorRampPalette(c("red","red4"))
+  if(min(df$AR)==0){
+    paletta<-c("#ffffff",palet(9))
+  }else{paletta<-palet(10)}
+  ver_color<-paletta[as.numeric(cut(df$AR,breaks=10))]
+  V(net)$color=ver_color
+  plot(net,vertex.size=5,vertex.label=NA,edge.arrow.size = 0.05,edge.size=0.1,layout=layout_with_fr(net)) #,layout=coordinates
+  legend("topleft",legend=round(seq(from=min(df$AR),to=max(df$AR),by=(max(df$AR)-min(df$AR))/9.),digits=3), col=paletta[1:10], pch=16,
+         title="Percentage of infected")
+}
