@@ -7,13 +7,13 @@ library(gridExtra)
 library(ggplot2)
 library(igraph)
 library(devtools)
-#devtools::install_github("lwillem/simid.course.2019",quiet=F)
-#devtools::uninstall('simid.course.2019')
-#library('simid.course.2019')
+devtools::install_github("lwillem/simid.course.2019",quiet=F)
+devtools::uninstall('simid.course.2019')
+library('simid.course.2019')
 
 # TODO: remove in final version
-source("/home/pietro/calcolo/SIMID_course/Github/simid.course.2019/R/meta_functions.R")
-source("/home/pietro/calcolo/SIMID_course/Github/simid.course.2019/R/meta_plot_functions.R")
+#source("/home/pietro/calcolo/SIMID_course/Github/simid.course.2019/R/meta_functions.R")
+#source("/home/pietro/calcolo/SIMID_course/Github/simid.course.2019/R/meta_plot_functions.R")
 
 N_patches=1     ### Number of patches of the system
 N_times=800      ### Number of simulation steps (if larger than end of epidemic is not a problem)
