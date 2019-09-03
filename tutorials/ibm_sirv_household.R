@@ -21,12 +21,10 @@ rm(list = ls())
 # FYI: sample with replacement from a vector   --> sample(vector, size, replace = T)
 # FYI: get sequence from 'min' up to 'max'     --> seq(min,max,step size)
 
-#library(devtools)
-#devtools::install_github("lwillem/simid.course.2019",quiet=F)
+library(devtools)
+devtools::install_github("lwillem/simid.course.2019",quiet=F)
 #devtools::uninstall('simid.course.2019')
 library('simid.course.2019')
-
-
 
 # if the 'fields' package is not installed --> install
 if(!'fields' %in% installed.packages()[,1]){ install.packages('fields')}
@@ -240,16 +238,29 @@ axis(1,seq(0,num_days,5))
 ########################################
 # TRANSMISSION MATRIX                  #
 ########################################
+# use 3-year age classes
 max_age                 <- max(pop_data$age)
 age_cat                 <- seq(1,max_age,3)
 transmission_age_matrix <- table(cut(pop_data$infector_age,age_cat,right=F),cut(pop_data$age,age_cat,right=F),dnn = list('age infector','age contact'))
 
+# create plot title with some driving parameters
+plot_title <- paste('num_cnt_community',num_contacts_community_day,' || ',
+                  'P_cnt_household', contact_prob_household, '\n',
+                  'P_cnt_school',contact_prob_school,' || ',
+                  'P_transmission',transmission_prob)
+
+plot_breaks
+# no figure panels, one plot
 par(mfrow=c(1,1))
+
+# plot the matrix with color coding
 image.plot(transmission_age_matrix,    # requires the 'field' package
            axes=F,
            xlab='Age infector',
            ylab='Age contact',
-           main='Transmission matrix',
+           #main='Transmission matrix',
+           main=plottitle,
+           legend.lab='number of infections',
            col=heat.colors(10),
            breaks=c(0:4,seq(5,25,5),max(c(30,transmission_age_matrix))))
 axis(side=1,
@@ -257,9 +268,9 @@ axis(side=1,
      labels=rownames(transmission_age_matrix),
      las=2,
      cex.axis=0.7)
+
 axis(side=2,
      at=seq(0,1,length.out=ncol(transmission_age_matrix)),
      labels=colnames(transmission_age_matrix),
      las=2,
      cex.axis=0.7)
-

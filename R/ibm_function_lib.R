@@ -112,7 +112,10 @@ print_sirv_geo_param <- function(){
   # collect possible parameter names
   all_param <- c('pop_size','num_days' ,'num_infected_seeds','vaccine_coverage',
                  'rng_seed','area_size','max_velocity','num_contacts_day',
-                 'max_contact_distance', 'num_days_infected','transmission_prob')
+                 'max_contact_distance', 'num_days_infected','transmission_prob',
+                 'num_contacts_community_day','contact_prob_household','contact_prob_school',
+                 'num_schools'
+                 )
 
   # initiate string
   param_str <- ''
