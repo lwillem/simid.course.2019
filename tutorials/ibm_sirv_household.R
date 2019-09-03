@@ -21,10 +21,12 @@ rm(list = ls())
 # FYI: sample with replacement from a vector   --> sample(vector, size, replace = T)
 # FYI: get sequence from 'min' up to 'max'     --> seq(min,max,step size)
 
-library(devtools)
+#library(devtools)
 #devtools::install_github("lwillem/simid.course.2019",quiet=F)
 #devtools::uninstall('simid.course.2019')
 library('simid.course.2019')
+
+
 
 # if the 'fields' package is not installed --> install
 if(!'fields' %in% installed.packages()[,1]){ install.packages('fields')}
@@ -36,7 +38,7 @@ library(fields)
 ########################################
 
 # population, time horizon and initial conditions
-pop_size              <- 4000     # population size                         ||default = 1000||
+pop_size              <- 2000     # population size                         ||default = 1000||
 num_days              <- 50       # number of days to simulate (time step = one day) ||default = 50||
 num_infected_seeds    <- 3       # initial number of intected individuals   ||default = 3||
 vaccine_coverage      <- 0.1        # vaccine coverage [0,1]                ||default = 0.1||
@@ -46,11 +48,15 @@ vaccine_coverage      <- 0.1        # vaccine coverage [0,1]                ||de
 area_size             <- 20         # simulated area = size x size                        ||default = 20||
 max_velocity          <- 0          # max movement in x and y direction per time step     ||default = 0||
 
+# school settings
+# note: we model (abstract) school contacts in our simulation
+num_schools            <- 2          # number of classes per age group
+target_school_ages     <- c(3:18)
+
 # social contact parameters
 num_contacts_community_day <- 5    # average number of social contacts per day in the general community ||default = 5||
 contact_prob_household     <- 1    # fully connected
-
-
+contact_prob_school        <- 0.1  # propability for an "effective contact" at school
 
 # disease parameters
 # note: R0 'cannot' be initialised in this type of model...
@@ -59,7 +65,7 @@ transmission_prob     <- 0.1      # transmission probability per social contact 
 
 # visualisation parameter
 # note: default '0.1' but set to '0' to disable this feature
-plot_time_delay       <- 0      # delay in seconds to slow down the "real-time" plot ||default = O||
+plot_time_delay       <- 0        # delay in seconds to slow down the "real-time" plot ||default = O||
 
 
 ##########################################################
@@ -72,14 +78,24 @@ if(exists('rng_seed')) {set.seed(rng_seed)}
 #   - age             the age of each individual
 #   - household_id    the household index of each individual
 #   - member_id       the household member index of each individual
-pop_data                       <- create_population_matrix(pop_size,area_size)
+pop_data              <- create_population_matrix(pop_size,area_size)
 
-head(pop_data)
+# initiate school classes by age and number of schools
+# eg. 'class3_1' is the 1th classroom with 3-year olds children
+pop_data$classroom_id <- paste0('class',pop_data$age,'_',sample(num_schools,pop_size,replace =T))
+
+# set 'classroom_id' for infants and adults to 'NA' (=none)
+boolean_school_pop    <- pop_data$age %in% target_school_ages
+pop_data$classroom_id[!boolean_school_pop] <- NA
+
+# check class sizes
+hist(table(pop_data$classroom_id),xlab='Size',main='School class size')
 
 # set contact and transmission parameters
-contact_prob_community        <- 1-exp(-num_contacts_community_day / pop_size)
-transmission_prob_household   <- contact_prob_household * transmission_prob
-transmission_prob_community   <- contact_prob_community * transmission_prob
+contact_prob_community         <- 1-exp(-num_contacts_community_day / pop_size)  # rate to probability
+transmission_prob_community    <- contact_prob_community * transmission_prob
+transmission_prob_household    <- contact_prob_household * transmission_prob
+transmission_prob_school       <- contact_prob_school    * transmission_prob
 
 # set vaccine coverage
 id_vaccinated                  <- sample(pop_size,pop_size*vaccine_coverage)
@@ -120,14 +136,21 @@ for(i_day in 1:num_days)
   for(p in ind_infected)
   {
     # new infections are possible in the household and in the community
+    flag_new_infection_community <- pop_data$health == 'S' &
+                                    rbinom(pop_size, size = 1, prob = transmission_prob_community)
+
     flag_new_infection_household <- pop_data$health == 'S' &
                                     pop_data$hh_id[p]  == pop_data$hh_id &
                                     rbinom(pop_size, size = 1, prob = transmission_prob_household)
 
-    flag_new_infection_community <- pop_data$health == 'S' &
-                                    rbinom(pop_size, size = 1, prob = transmission_prob_community)
+    flag_new_infection_school    <- pop_data$health == 'S' &
+                                    pop_data$classroom_id[p]  == pop_data$classroom_id &
+                                    rbinom(pop_size, size = 1, prob = transmission_prob_school)
+    # fix NA's in the school boolean
+    flag_new_infection_school[is.na(flag_new_infection_school)] <- FALSE
 
-    flag_new_infection           <- flag_new_infection_household | flag_new_infection_community
+    # aggregate booleans
+    flag_new_infection           <- flag_new_infection_household | flag_new_infection_community | flag_new_infection_school
 
     # mark new infected individuals
     pop_data$health[flag_new_infection] <- 'I'
@@ -224,10 +247,11 @@ transmission_age_matrix <- table(cut(pop_data$infector_age,age_cat,right=F),cut(
 par(mfrow=c(1,1))
 image.plot(transmission_age_matrix,    # requires the 'field' package
            axes=F,
-           xlab='age infector',
-           ylab='age contact',
-           main='transmission matrix',
-           col=heat.colors(10))
+           xlab='Age infector',
+           ylab='Age contact',
+           main='Transmission matrix',
+           col=heat.colors(10),
+           breaks=c(0:6,8,10,15,max(c(20,transmission_age_matrix))))
 axis(side=1,
      at=seq(0,1,length.out=nrow(transmission_age_matrix)),
      labels=rownames(transmission_age_matrix),
