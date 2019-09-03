@@ -247,14 +247,19 @@ plot_AR_network<-function(trav_matr,list_results,pop_ch,pop_ad){
   I_tot<-list_results[[5]]+list_results[[2]]
   df<-data.frame(id=1:dim(I_tot)[1],AR=rowSums(I_tot)/(pop_ad+pop_ch))
   ##################
+  tot_pop<-pop_ch+pop_ad
+  tot_pop<-tot_pop/max(tot_pop)
+  V(net)$size<-tot_pop*8
   set_vertex_attr(net,name="AR",value=df$AR)
+  set_vertex_attr(net,name="popolation",value=tot_pop)
   palet<-colorRampPalette(c("red","red4"))
   if(min(df$AR)==0){
     paletta<-c("#ffffff",palet(9))
   }else{paletta<-palet(10)}
   ver_color<-paletta[as.numeric(cut(df$AR,breaks=10))]
   V(net)$color=ver_color
-  plot(net,vertex.size=5,vertex.label=NA,edge.arrow.size = 0.05,edge.size=0.1,layout=layout_with_fr(net)) #,layout=coordinates
+  
+  plot(net,vertex.label=NA,edge.arrow.size = 0.05,edge.size=0.1,layout=layout_with_fr(net)) #,layout=coordinates
   legend("topleft",legend=round(seq(from=min(df$AR),to=max(df$AR),by=(max(df$AR)-min(df$AR))/9.),digits=3), col=paletta[1:10], pch=16,
          title="Percentage of infected")
 }
