@@ -4,10 +4,12 @@
 \alias{create_population_matrix}
 \title{Create a synthetic population with households of the given size}
 \usage{
-create_population_matrix(target_pop_size)
+create_population_matrix(pop_size, area_size)
 }
 \arguments{
-\item{target_pop_size}{the final population size}
+\item{pop_size}{the final population size}
+
+\item{area_size}{the size of the simulation area (to sample coordinates)}
 }
 \description{
 This function creates a population with households of size 4.
