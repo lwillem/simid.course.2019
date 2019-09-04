@@ -7,26 +7,26 @@ library(gridExtra)
 library(ggplot2)
 library(igraph)
 library(devtools)
-devtools::install_github("lwillem/simid.course.2019",quiet=F)
-devtools::uninstall('simid.course.2019')
-library('simid.course.2019')
+# devtools::install_github("lwillem/simid.course.2019",quiet=F)
+# devtools::uninstall('simid.course.2019')
+# library('simid.course.2019')
 
 # TODO: remove in final version
-#source("/home/pietro/calcolo/SIMID_course/Github/simid.course.2019/R/meta_functions.R")
-#source("/home/pietro/calcolo/SIMID_course/Github/simid.course.2019/R/meta_plot_functions.R")
+source(here("/R/meta_functions.R"))
+source(here("/R/meta_plot_functions.R"))
 
-N_patches=1     ### Number of patches of the system
+N_patches=50     ### Number of patches of the system
 N_times=800      ### Number of simulation steps (if larger than end of epidemic is not a problem)
-beta=0.039       ### Per-contact rate of infection of SIR
+beta=0.06       ### Per-contact rate of infection of SIR
 gamma=0.033      ### Rate of recovery 
 
 ###### Setting population of children and adults #####
 ## Fixed population
-population_adults=rep(3000,N_patches) 
-population_children=rep(3000,N_patches)
+#population_adults=rep(3000,N_patches) 
+#population_children=rep(3000,N_patches)
 ## Variable population
-#population_adults=sample(x=15:3000,size=N_patches)
-#population_children=sample(x=15:3000,size=N_patches)
+population_adults=sample(x=15:6000,size=N_patches)
+population_children=sample(x=15:6000,size=N_patches)
 ## Population set by Belgian demography
 # demography<-loadDemographyBelgium()
 # population_adults  <- as.integer(demography[[1]]/100)
@@ -39,23 +39,24 @@ population_children[population_children==0]<-1
 
 
 ###### Setting travellers numbers  #####
-trav_prob_ch<-0.09
-trav_prob_ad<-0.09
+trav_prob_ch<-0.8  ### Probability of travelling. The number of travellers is prob*population
+trav_prob_ad<-0.8  ### Probability of travelling. The number of travellers is prob*population
 ## Travellers from fully connected network
-trav_data_ch<-traveler_data_fully_connected(N_patches,trav_prob_ch,population_children)
-trav_data_ad<-traveler_data_fully_connected(N_patches,trav_prob_ad,population_adults)  
+#trav_data_ch<-traveler_data_fully_connected(N_patches,trav_prob_ch,population_children)
+#trav_data_ad<-traveler_data_fully_connected(N_patches,trav_prob_ad,population_adults)  
 
 ## Travellers from random (Erdos-Reny) network
-#trav_data_ch<-traveler_data_ER(2.2/N_patches,N_patches,trav_prob_ch,population_adults)
-#trav_data_ad<-traveler_data_ER(2.2/N_patches,N_patches,trav_prob_ad,population_children)
+trav_data_ch<-traveler_data_ER(0.2/N_patches,N_patches,trav_prob_ch,population_adults)
+trav_data_ad<-traveler_data_ER(0.2/N_patches,N_patches,trav_prob_ad,population_children)
 ## Travellers from scale-free (Barabasy-Albert) network
-#trav_data_ch<-traveler_data_BA(N_patches,50/3000,population_children)
-#trav_data_ad<-traveler_data_BA(N_patches,50/3000,population_adults)
+#trav_data_ch<-traveler_data_BA(N_patches,trav_prob_ch,population_children)
+#trav_data_ad<-traveler_data_BA(N_patches,trav_prob_ad,population_adults)
 ## Travellers given by Belgian census
 #trav_data_ch<-loadTravelBelgium("children")
 #trav_data_ad<-loadTravelBelgium("adults")
 
-
+plot_network(trav_data_ch+trav_data_ad,population_children,population_adults,"circle")
+  
 ### In case there is only one patch--> need to amend the travellers matrixs
 if(N_patches==1){
   trav_data_ch=matrix(0,ncol=1,nrow=1)
@@ -130,7 +131,7 @@ R_matrix_adults[,1]=Adults[,3]
 
 ### Initialize contact matrix
 
-Cmax_const<-matrix(data=rep(1.,4),nrow=2,ncol=2)  ### Constant values for each age category
+Cmax_const<-matrix(data=rep(0.25,4),nrow=2,ncol=2)  ### Constant values for each age category
 Cmax_reg_weekday<-matrix(data=c(40.7,7.8,7.8,14.3),nrow=2,ncol=2) ### Realistic values for a regular weekend in Belgium
 ContactMatrix<-Cmax_const   ### Deciding which contact matrix to use
 
@@ -176,16 +177,14 @@ for(i_time in 3:N_times){
 final_result<-list(S_matrix_children,I_matrix_children,R_matrix_children,S_matrix_adults,I_matrix_adults,R_matrix_adults)
 
 ### Plot all the compartments for the whole system
-plot_global_epidemic_ageclasses(final_result)
+#plot_global_epidemic_ageclasses(final_result)
 
 ### Plot the infected compartments for the whole system, by age classes
-plot_infected_ageclasses(final_result,800)
+plot_infected_ageclasses(final_result,100)
 
 ### Plot the attack rate by age class
 plot_AR(final_result,population_children,population_adults)
 
 trav_matrix<-trav_ch[[1]]+trav_ch[[2]]+trav_ch[[3]]+trav_ad[[1]]+trav_ad[[2]]+trav_ad[[3]]  ### Summing all the travellers
-
-### Plot the attack rate on the network of patches
-plot_AR_network(trav_matrix,final_result,population_children,population_adults)  
+plot_AR_network(trav_matrix,final_result,population_children,population_adults,"none")  
 
