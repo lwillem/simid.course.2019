@@ -248,21 +248,19 @@ plot_title <- paste('num_cnt_community',num_contacts_community_day,' || ',
                   'P_cnt_household', contact_prob_household, '\n',
                   'P_cnt_school',contact_prob_school,' || ',
                   'P_transmission',transmission_prob)
-
-plot_breaks
+plot_breaks <- c(0:4,seq(5,25,5),max(c(30,transmission_age_matrix)))
 # no figure panels, one plot
 par(mfrow=c(1,1))
 
 # plot the matrix with color coding
 image.plot(transmission_age_matrix,    # requires the 'field' package
-           axes=F,
-           xlab='Age infector',
-           ylab='Age contact',
-           #main='Transmission matrix',
-           main=plottitle,
+           axes = F,
+           xlab = 'Age infector',
+           ylab = 'Age contact',
+           main = plot_title,
            legend.lab='number of infections',
-           col=heat.colors(10),
-           breaks=c(0:4,seq(5,25,5),max(c(30,transmission_age_matrix))))
+           col = heat.colors(length(plot_breaks)-1),
+           breaks = plot_breaks)
 axis(side=1,
      at=seq(0,1,length.out=nrow(transmission_age_matrix)),
      labels=rownames(transmission_age_matrix),
