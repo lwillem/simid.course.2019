@@ -418,7 +418,9 @@ loadDemographyBelgium<-function(){
 #' @export
 #'
 loadTravelBelgium<-function(ageclass_string){
-  data<-read.csv("../Data/Belgium_commuters.csv",sep = "\t")
+  #data<-read.csv("../Data/Belgium_commuters.csv",sep = "\t")
+  data<-data_bel_commuters     # load package data
+
   Npatches<-max(data$Source)+1
   trav_data=matrix(rep.int(0,Npatches*Npatches),nrow=Npatches,ncol=Npatches)
   if(ageclass_string=="children"){

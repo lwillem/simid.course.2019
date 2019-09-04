@@ -35,7 +35,8 @@
 # PACKAGE DATA
 # data_bel<-read.csv("data/Belgium_demographics.csv")
 # usethis::use_data(data_bel)
-
+# data_bel_commuters<-read.csv("data/Belgium_commuters.csv",sep = "\t")
+# usethis::use_data(data_bel_commuters)
 
 NULL
 
