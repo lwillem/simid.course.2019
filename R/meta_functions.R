@@ -9,7 +9,7 @@
 #'
 traveler_data_fully_connected<-function(Npatches,prob_travel,reference_population){
   net<-make_full_graph(Npatches)
-  b<-as_adjacency_matrix(net)
+  b<-as.matrix(as_adjacency_matrix(net))
   matr_tr<-matrix(rep(0,Npatches*Npatches),ncol = Npatches,nrow = Npatches)
   for(i in 1:Npatches){
     Ntraveler_tot=reference_population[i]*prob_travel
@@ -30,9 +30,8 @@ traveler_data_fully_connected<-function(Npatches,prob_travel,reference_populatio
         # print(paste0("i= ",i," Rem[" ,count,"]= ",Remaining_travelers))
       }
     }
-   
   }
-  plot(graph_from_adjacency_matrix(matr_tr),vertex.size=5,vertex.label=NA,edge.arrow.size = 0.05,edge.size=0.1,layout=layout_with_fr(net)) 
+  #plot(graph_from_adjacency_matrix(matr_tr),vertex.size=5,vertex.label=NA,edge.arrow.size = 0.05,edge.size=0.1,layout=layout_with_fr(net)) 
   return(matr_tr)
 }
 
@@ -45,7 +44,7 @@ traveler_data_fully_connected<-function(Npatches,prob_travel,reference_populatio
 traveler_data_ER<-function(prob_link,Npatches,prob_travel,reference_population){
   net<-sample_gnp(Npatches, prob_link, directed = TRUE, loops = FALSE)
   #plot(net,edge.arrow.size = 0.05,edge.size=0.1,vertex.size=1,layout=layout.circle(net))
-  b<-as_adjacency_matrix(net)
+  b<-as.matrix(as_adjacency_matrix(net))
   matr_tr<-matrix(rep(0,Npatches*Npatches),ncol = Npatches,nrow = Npatches)
   for(i in 1:Npatches){
     Ntraveler_tot=reference_population[i]*prob_travel
@@ -80,8 +79,8 @@ traveler_data_BA<-function(Npatches,prob_travel,reference_population){
   net<-sample_pa(n=Npatches, power = 1.1, directed = TRUE,m=2)
   # prob_travel<-0.05
   # reference_population<-Children
-  plot(net,edge.arrow.size = 0.05,edge.size=0.1,vertex.size=1,layout=layout.circle(net))
-  b<-as_adjacency_matrix(net)
+  #plot(net,edge.arrow.size = 0.05,edge.size=0.1,vertex.size=1,layout=layout.circle(net))
+  b<-as.matrix(as_adjacency_matrix(net))
   matr_tr<-matrix(rep(0,Npatches*Npatches),ncol = Npatches,nrow = Npatches)
   for(i in 1:Npatches){
     Ntraveler_tot=reference_population[i]*prob_travel
