@@ -20,13 +20,10 @@ library(gridExtra)
 library(ggplot2)
 library(igraph)
 library(devtools)
-# devtools::install_github("lwillem/simid.course.2019",quiet=F)
+devtools::install_github("lwillem/simid.course.2019",quiet=F)
 # devtools::uninstall('simid.course.2019')
  library('simid.course.2019')
 
-# TODO: remove in final version
-source(here("/R/meta_functions.R"))
-source(here("/R/meta_plot_functions.R"))
 
 N_patches=50     ### Number of patches of the system
 N_times=800      ### Number of simulation steps (if larger than end of epidemic is not a problem)
