@@ -31,6 +31,12 @@
 ## PACKAGE ADMIN
 #usethis::use_build_ignore("tutorials")
 #usethis::use_gpl3_license("lwillem")
+
+# PACKAGE DATA
+# data_bel<-read.csv("data/Belgium_demographics.csv")
+# usethis::use_data(data_bel)
+
+
 NULL
 
 

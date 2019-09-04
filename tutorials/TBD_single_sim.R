@@ -1,19 +1,38 @@
+#############################################################################
+# This file is part of the SIMID course material
+#
+# Copyright 2019, CHERMID, UNIVERSITY OF ANTWERP
+#############################################################################
+#
+# IBM: SIRV MODEL WITH
+#   --> INDIVIDUAL-BASED 2-LEVEL MIXING: HOUSEHOLDS & COMMUNITY
+#   --> HEALTH STATES S=0, I=1, R=2, V=3
+#   --> VACCINE EFFICACY: 100%
+#   --> HOUSEHOLD ARE FULLY CONNECTED
+#
+#############################################################################
 
+## set working directory (or open RStudio with this script)
+# setwd("C:\\User\\path\\to\\the\\rcode\\folder") ## WINDOWS
+# setwd("/Users/path/to/the/rcode/folder") ## MAC
 
-rm(list=ls())
+# clear global environment
+rm(list = ls())
 
+# load packages
 library(here)
 library(gridExtra)
 library(ggplot2)
 
-#library(devtools)
-#devtools::install_github("lwillem/simid.course.2019",quiet=F)
+library(devtools)
+devtools::install_github("lwillem/simid.course.2019",quiet=F)
 #devtools::uninstall('simid.course.2019')
-#library('simid.course.2019')
+library('simid.course.2019')
 
-# TODO: remove in final version
-source("R/meta_functions.R")
-source("R/meta_plot_functions.R")
+
+########################################
+# MODEL SETTINGS                       #
+########################################
 
 N_patches=100
 N_times=300
@@ -36,6 +55,9 @@ I_matrix_children=matrix(nrow=N_patches,ncol = N_times)
 R_matrix_adults=matrix(nrow=N_patches,ncol = N_times)
 R_matrix_children=matrix(nrow=N_patches,ncol = N_times)
 
+##########################################################
+# INITIALIZE POPULATION & MODEL PARAMETERS               #
+##########################################################
 
 ## Initialize the population
 for(i in 1:N_patches){
@@ -83,6 +105,10 @@ I_matrix_adults[,2]=Adults[,2]
 R_matrix_children[,2]=Children[,3]
 R_matrix_adults[,2]=Adults[,3]
 
+########################################
+# RUN THE MODEL                        #
+########################################
+
 for(i_time in 3:N_times){
   thereIsEpidemic<-sum(I_matrix_children[,i_time-1])+sum(I_matrix_adults[,i_time-1])
   if(thereIsEpidemic!=0){
@@ -104,6 +130,10 @@ for(i_time in 3:N_times){
 }
 
 final_result<-list(S_matrix_children,I_matrix_children,R_matrix_children,S_matrix_adults,I_matrix_adults,R_matrix_adults)
+
+########################################
+# PLOT RESULTS                         #
+########################################
 
 plot_global_epidemic_ageclasses(final_result)
 

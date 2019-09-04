@@ -30,8 +30,14 @@ traveler_data_fully_connected<-function(Npatches,prob_travel,reference_populatio
         # print(paste0("i= ",i," Rem[" ,count,"]= ",Remaining_travelers))
       }
     }
+<<<<<<< HEAD
   }
   #plot(graph_from_adjacency_matrix(matr_tr),vertex.size=5,vertex.label=NA,edge.arrow.size = 0.05,edge.size=0.1,layout=layout_with_fr(net)) 
+=======
+
+  }
+  plot(graph_from_adjacency_matrix(matr_tr),vertex.size=5,vertex.label=NA,edge.arrow.size = 0.05,edge.size=0.1,layout=layout_with_fr(net))
+>>>>>>> 64cfd76b1d66eeb146af460a3ee08f996bb40dbb
   return(matr_tr)
 }
 
@@ -65,7 +71,7 @@ traveler_data_ER<-function(prob_link,Npatches,prob_travel,reference_population){
         # print(paste0("i= ",i," Rem[" ,count,"]= ",Remaining_travelers))
       }
     }
-    
+
   }
   return(matr_tr)
 }
@@ -101,7 +107,7 @@ traveler_data_BA<-function(Npatches,prob_travel,reference_population){
         # print(paste0("i= ",i," Rem[" ,count,"]= ",Remaining_travelers))
       }
     }
-    
+
   }
   return(matr_tr)
 }
@@ -131,7 +137,7 @@ select_travellers<-function(matr_pop,trav_data){
       #        print(paste0("i= ",i,"j= ",j, " Ntravel= ",Ntravel))
       #        print(paste0("NTravel_S= ",Ntravel_S," NTravel_I= ",Ntravel_I," Travel_R= ",Ntravel_R))
       #}
-      
+
       trav_S[i,j]<-Ntravel_S
       trav_I[i,j]<-Ntravel_I
       trav_R[i,j]<-Ntravel_R
@@ -160,16 +166,16 @@ spread_in_patch<-function(matrPopC,matrPopA,beta_par,gamma_par,ContMatr){
   for(i in 1:Npatches){
     I_children=matrPopC[i,2]
     I_adults=matrPopA[i,2]
-    #print(paste0("i= ",i," Infected children= ",I_children," Infected adults= ",I_adults," total population= ",total_population_now[i]))    
+    #print(paste0("i= ",i," Infected children= ",I_children," Infected adults= ",I_adults," total population= ",total_population_now[i]))
     InfectionForce_children<-beta_par*ContMatr[1,1]*(I_children)/total_population_now[i]+beta_par*ContMatr[1,2]*(I_adults)/total_population_now[i]
     InfectionForce_children<-min(InfectionForce_children,1.)
     InfectionForce_adults<-beta_par*ContMatr[2,1]*(I_children)/total_population_now[i]+beta_par*ContMatr[2,2]*(I_adults)/total_population_now[i]
     InfectionForce_adults<-min(InfectionForce_adults,1.)
 #    if(i==1){
-      
+
     #print(paste0(InfectionForce_children,"  ",InfectionForce_adults,"Eventuale draw ",rbinom(n=1,size=matrPopC[i,1],prob=InfectionForce_children),"Eventuale draw ",rbinom(n=1,size=matrPopC[i,1],prob=InfectionForce_adults)))
-#    }      
-      
+#    }
+
     if((matrPopC[i,1]*InfectionForce_children)>0){
       #print(paste0("[ Children] Infection force X S = ",matrPopC[i,1]*InfectionForce_children))
       newly_infectedC[i]<-rbinom(n=1,size=matrPopC[i,1],prob=InfectionForce_children)
@@ -177,7 +183,7 @@ spread_in_patch<-function(matrPopC,matrPopA,beta_par,gamma_par,ContMatr){
     if((matrPopA[i,1]*InfectionForce_adults)>0){
       #print(paste0("[ Adults] Infection force X S = ",matrPopA[i,1]*InfectionForce_adults))
       newly_infectedA[i]<-rbinom(n=1,size=matrPopA[i,1],prob=InfectionForce_adults)
-      
+
     }
   }
   for(i in 1:Npatches){
@@ -243,7 +249,7 @@ spread_in_patch_and_among_travellers<-function(matrPopC,matrPopA,beta_par,gamma_
             Ch_I_trav[j,i]=Ch_I_trav[j,i]+newly_infectedC_trav
  #         }
       }
-    }  
+    }
     if(InfectionForce_adults>0){
       for(j in 1:Npatches){  ### Should be 2:Npatches (1 is kept for single patch case)
         if((Ad_S_trav[j,i])>0){
@@ -403,7 +409,8 @@ compute_quantiles<-function(all_sim_results,Nsimulations,id_to_compute){
 #' @export
 #'
 loadDemographyBelgium<-function(){
-  data<-read.csv("../Data/Belgium_demographics.csv")
+  #data<-read.csv("../Data/Belgium_demographics.csv")
+  data <- data_bel                                      #use package data
   pop_ch<-data$P18LESS
   pop_ad<-data$P19MORE
   return(list(pop_ch,pop_ad))
