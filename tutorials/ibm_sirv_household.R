@@ -36,7 +36,7 @@ library(fields)
 ########################################
 
 # population, time horizon and initial conditions
-pop_size              <- 2000     # population size                         ||default = 1000||
+pop_size              <- 2000     # population size                         ||default = 2000||
 num_days              <- 50       # number of days to simulate (time step = one day) ||default = 50||
 num_infected_seeds    <- 3       # initial number of intected individuals   ||default = 3||
 vaccine_coverage      <- 0.1        # vaccine coverage [0,1]                ||default = 0.1||
@@ -77,6 +77,9 @@ if(exists('rng_seed')) {set.seed(rng_seed)}
 #   - household_id    the household index of each individual
 #   - member_id       the household member index of each individual
 pop_data              <- create_population_matrix(pop_size,area_size)
+
+# option: to use a pre-computed population
+#pop_data              <- get_default_population_matrix(pop_size,area_size)
 
 # initiate school classes by age and number of schools
 # eg. 'class3_1' is the 1th classroom with 3-year olds children

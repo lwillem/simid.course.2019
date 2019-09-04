@@ -21,9 +21,9 @@
 #
 #############################################################################
 
-#' @title Create a synthetic population with households of the given size
+#' @title Create a synthetic population with households
 #'
-#' @description This function creates a population with households of size 4.
+#' @description This function creates a population with households
 #'
 #' @param pop_size  the final population size
 #' @param area_size the size of the simulation area (to sample coordinates)
@@ -124,5 +124,28 @@ create_population_matrix <- function(pop_size,area_size)
 } # end function
 
 
+#' @title Load a precomputed synthetic population with households
+#'
+#' @param pop_size  the final population size
+#' @param area_size the size of the simulation area (to sample coordinates)
+#'
+#' @keywords external
+#' @export
+get_default_population_matrix <- function(pop_size,area_size)
+{
+
+  if(pop_size == 2e3 && area_size==20){
+
+    print("Use pre-computed population")
+
+    # use previously create population
+    return(pop_matrix_2e3_20)
+
+  } else{
+    stop('The function "get_default_population_matrix" only works with pop_size = 2e3 and area_size=20')
+  }
+
+  return(NULL)
+}
 
 

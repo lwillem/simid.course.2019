@@ -32,11 +32,15 @@
 #usethis::use_build_ignore("tutorials")
 #usethis::use_gpl3_license("lwillem")
 
-# PACKAGE DATA
+# PACKAGE DATA: METAPOPULATION
 # data_bel<-read.csv("data/Belgium_demographics.csv")
 # usethis::use_data(data_bel)
 # data_bel_commuters<-read.csv("data/Belgium_commuters.csv",sep = "\t")
 # usethis::use_data(data_bel_commuters)
+
+# PACKAGE DATA: IBM
+# pop_matrix_2e3_20 <- create_population_matrix(2e3,20)
+# usethis::use_data(pop_matrix_2e3_20,overwrite = T)
 
 NULL
 
