@@ -1,5 +1,18 @@
+#############################################################################
+# This file is part of the SIMID course material
+#
+# Copyright 2019, CHERMID, UNIVERSITY OF ANTWERP
+#############################################################################
+#
+# METAPOPULATION
+#
+#############################################################################
 
+## set working directory (or open RStudio with this script)
+# setwd("C:\\User\\path\\to\\the\\rcode\\folder") ## WINDOWS
+# setwd("/Users/path/to/the/rcode/folder") ## MAC
 
+# clear global environment
 rm(list=ls())
 
 library(here)
@@ -9,7 +22,7 @@ library(igraph)
 library(devtools)
 # devtools::install_github("lwillem/simid.course.2019",quiet=F)
 # devtools::uninstall('simid.course.2019')
-# library('simid.course.2019')
+ library('simid.course.2019')
 
 # TODO: remove in final version
 source(here("/R/meta_functions.R"))
@@ -18,11 +31,11 @@ source(here("/R/meta_plot_functions.R"))
 N_patches=50     ### Number of patches of the system
 N_times=800      ### Number of simulation steps (if larger than end of epidemic is not a problem)
 beta=0.06       ### Per-contact rate of infection of SIR
-gamma=0.033      ### Rate of recovery 
+gamma=0.033      ### Rate of recovery
 
 ###### Setting population of children and adults #####
 ## Fixed population
-#population_adults=rep(3000,N_patches) 
+#population_adults=rep(3000,N_patches)
 #population_children=rep(3000,N_patches)
 ## Variable population
 population_adults=sample(x=15:6000,size=N_patches)
@@ -43,7 +56,7 @@ trav_prob_ch<-0.8  ### Probability of travelling. The number of travellers is pr
 trav_prob_ad<-0.8  ### Probability of travelling. The number of travellers is prob*population
 ## Travellers from fully connected network
 #trav_data_ch<-traveler_data_fully_connected(N_patches,trav_prob_ch,population_children)
-#trav_data_ad<-traveler_data_fully_connected(N_patches,trav_prob_ad,population_adults)  
+#trav_data_ad<-traveler_data_fully_connected(N_patches,trav_prob_ad,population_adults)
 
 ## Travellers from random (Erdos-Reny) network
 trav_data_ch<-traveler_data_ER(0.2/N_patches,N_patches,trav_prob_ch,population_adults)
@@ -56,7 +69,7 @@ trav_data_ad<-traveler_data_ER(0.2/N_patches,N_patches,trav_prob_ad,population_c
 #trav_data_ad<-loadTravelBelgium("adults")
 
 plot_network(trav_data_ch+trav_data_ad,population_children,population_adults,"circle")
-  
+
 ### In case there is only one patch--> need to amend the travellers matrixs
 if(N_patches==1){
   trav_data_ch=matrix(0,ncol=1,nrow=1)
@@ -86,7 +99,7 @@ for(i in 1:N_patches){
   Children[i,1]=population_children[i]
 }
 
-### Defining the initial infected 
+### Defining the initial infected
 initial_infected_ch=rep(0,N_patches)
 initial_infected_ad=rep(0,N_patches)
 
@@ -139,7 +152,7 @@ ContactMatrix<-Cmax_const   ### Deciding which contact matrix to use
 
 ## Initial spread for T=0
 result0<-spread_in_patch(Children,Adults,beta,gamma,ContactMatrix)
-Children<-result0[[1]]  ## Moving the results of the simulation to the compartments' population for children  
+Children<-result0[[1]]  ## Moving the results of the simulation to the compartments' population for children
 Adults<-result0[[2]]    ## Moving the results of the simulation to the compartments' population for adults
 
 ### Setting the value of each compartment at second time step of simulation
@@ -150,7 +163,7 @@ I_matrix_adults[,2]=Adults[,2]
 R_matrix_children[,2]=Children[,3]
 R_matrix_adults[,2]=Adults[,3]
 
-### Starting the simulation 
+### Starting the simulation
 for(i_time in 3:N_times){
   thereIsEpidemic<-sum(I_matrix_children[,i_time-1])+sum(I_matrix_adults[,i_time-1]) ### Check if there is an epidemic
   if(thereIsEpidemic!=0){  ### If there is an epidemic --> do the travel and the spread
@@ -160,10 +173,10 @@ for(i_time in 3:N_times){
     results<-do_one_timestep_tris(Children,Adults,ContactMatrix,beta,gamma,trav_ch,trav_ad)  ## I perform one time-step of the simulation
     print(" ....DONE")
   }
-  
-  Children=results[[1]] ## Moving the results of the simulation to the compartments' population for children  
+
+  Children=results[[1]] ## Moving the results of the simulation to the compartments' population for children
   Adults=results[[2]]   ## Moving the results of the simulation to the compartments' population for adults
-  
+
   ### Setting the value of each compartment at the i_timeth time step of simulation
   S_matrix_children[,i_time]=Children[,1]
   S_matrix_adults[,i_time]=Adults[,1]
@@ -186,5 +199,5 @@ plot_infected_ageclasses(final_result,100)
 plot_AR(final_result,population_children,population_adults)
 
 trav_matrix<-trav_ch[[1]]+trav_ch[[2]]+trav_ch[[3]]+trav_ad[[1]]+trav_ad[[2]]+trav_ad[[3]]  ### Summing all the travellers
-plot_AR_network(trav_matrix,final_result,population_children,population_adults,"none")  
+plot_AR_network(trav_matrix,final_result,population_children,population_adults,"none")
 

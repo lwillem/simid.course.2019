@@ -30,14 +30,8 @@ traveler_data_fully_connected<-function(Npatches,prob_travel,reference_populatio
         # print(paste0("i= ",i," Rem[" ,count,"]= ",Remaining_travelers))
       }
     }
-<<<<<<< HEAD
-  }
-  #plot(graph_from_adjacency_matrix(matr_tr),vertex.size=5,vertex.label=NA,edge.arrow.size = 0.05,edge.size=0.1,layout=layout_with_fr(net)) 
-=======
-
   }
   plot(graph_from_adjacency_matrix(matr_tr),vertex.size=5,vertex.label=NA,edge.arrow.size = 0.05,edge.size=0.1,layout=layout_with_fr(net))
->>>>>>> 64cfd76b1d66eeb146af460a3ee08f996bb40dbb
   return(matr_tr)
 }
 

@@ -4,7 +4,7 @@
 \alias{plot_AR_network}
 \title{plot_AR_network}
 \usage{
-plot_AR_network(trav_matr, list_results, pop_ch, pop_ad)
+plot_AR_network(trav_matr, list_results, pop_ch, pop_ad, lay)
 }
 \description{
 plot_AR_network
